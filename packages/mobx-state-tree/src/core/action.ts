@@ -52,7 +52,17 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const node = getStateTreeNode(context.context)
     const baseIsRunningAction = node._isRunningAction
     const prevContext = currentActionContext
-    node.assertAlive()
+
+    const dontValidateNodeAliveOn: IMiddlewareEventType[] = [
+        "flow_resume",
+        "flow_resume_error",
+        "flow_throw"
+    ]
+
+    if (dontValidateNodeAliveOn.indexOf(context.type) === -1) {
+        node.assertAlive()
+    }
+
     node._isRunningAction = true
     currentActionContext = context
     try {
